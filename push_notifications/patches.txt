@@ -1,0 +1,2 @@
+# Patches for push_notifications app
+# Format: module_name.path.to.patch_file
