@@ -5,7 +5,7 @@ from google.oauth2 import service_account
 from google.auth.transport.requests import Request
 
 
-@frappe.whitelist(allow_guest=False, methods=['GET', 'POST'])
+@frappe.whitelist()
 def send_push_notification(user=None, subject=None, body=None, doctype=None, docname=None):
     """
     Send push notification to user's mobile device
@@ -19,12 +19,12 @@ def send_push_notification(user=None, subject=None, body=None, doctype=None, doc
         docname: Optional - source document name
     """
     
-    # Get from URL params or POST data (frappe.form_dict handles both)
-    user = user or frappe.form_dict.get('user')
-    subject = subject or frappe.form_dict.get('subject')
-    body = body or frappe.form_dict.get('body')
-    doctype = doctype or frappe.form_dict.get('doctype')
-    docname = docname or frappe.form_dict.get('docname')
+    # Get from webhook POST data - support multiple field name variations
+    user = frappe.form_dict.get('for_user') or frappe.form_dict.get('user') or user
+    subject = frappe.form_dict.get('subject') or subject
+    body = frappe.form_dict.get('body') or frappe.form_dict.get('message') or frappe.form_dict.get('email_content') or body
+    doctype = frappe.form_dict.get('doctype') or doctype
+    docname = frappe.form_dict.get('docname') or docname
     
     # Validate required parameters
     if not user:
