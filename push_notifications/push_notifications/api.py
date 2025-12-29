@@ -5,10 +5,11 @@ from google.oauth2 import service_account
 from google.auth.transport.requests import Request
 
 
-@frappe.whitelist()
-def send_push_notification(user, subject, body, doctype=None, docname=None):
+@frappe.whitelist(allow_guest=False, methods=['GET', 'POST'])
+def send_push_notification(user=None, subject=None, body=None, doctype=None, docname=None):
     """
     Send push notification to user's mobile device
+    Accepts data from both URL parameters and POST body
     
     Args:
         user: ERPNext username to send notification to
@@ -17,6 +18,17 @@ def send_push_notification(user, subject, body, doctype=None, docname=None):
         doctype: Optional - source doctype
         docname: Optional - source document name
     """
+    
+    # Get from URL params or POST data (frappe.form_dict handles both)
+    user = user or frappe.form_dict.get('user')
+    subject = subject or frappe.form_dict.get('subject')
+    body = body or frappe.form_dict.get('body')
+    doctype = doctype or frappe.form_dict.get('doctype')
+    docname = docname or frappe.form_dict.get('docname')
+    
+    # Validate required parameters
+    if not user:
+        return {"success": False, "message": "User parameter required"}
     
     try:
         # Get Firebase config
