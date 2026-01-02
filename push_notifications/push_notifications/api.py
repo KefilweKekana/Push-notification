@@ -111,3 +111,19 @@ def send_push_notification(user=None, subject=None, body=None, doctype=None, doc
         error_msg = f"Error sending push notification: {str(e)}"
         frappe.log_error(error_msg, "Push Notification Error")
         return {"success": False, "message": error_msg}
+
+
+def send_notification_on_insert(doc, method):
+    """
+    Called automatically when Notification Log is created
+    This function is NOT whitelisted - it's only called internally by doc_events
+    """
+    if not doc.for_user:
+        return
+    
+    # Call the main function
+    send_push_notification(
+        user=doc.for_user,
+        subject=doc.subject,
+        body=doc.message or doc.email_content or doc.subject or "New notification"
+    )
