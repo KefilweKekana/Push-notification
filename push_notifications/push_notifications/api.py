@@ -125,5 +125,5 @@ def send_notification_on_insert(doc, method):
     send_push_notification(
         user=doc.for_user,
         subject=doc.subject,
-        body=doc.message or doc.email_content or doc.subject or "New notification"
+        body=doc.email_content or doc.subject or "New notification"
     )
